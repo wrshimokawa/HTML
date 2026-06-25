@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste de Formulário Dinâmico ES5</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="showModalForm.js"></script>
+</head>
+
+<body>
+
+  <h1>Componente de Janela Modal Dinâmica</h1>
+  <p>Clique abaixo para configurar os metadados do formulário, efetuar a chamada e analisar o retorno.</p>
+
+  <button id="btnDispararForm" class="btn-teste">Abrir Formulário Customizado</button>
+
+  <div id="log-resultado"></div>
+
+  <!-- Script de Teste / Acionamento -->
+  <script>
+    document.getElementById("btnDispararForm").addEventListener("click", function() {
+      // Definição da lista contendo os campos parametrizados de forma dinâmica
+      var definicaoDeCampos = [{
+          tipo: "text",
+          label: "Código Identificador (Somente Leitura)",
+          name: "id_chamado",
+          required: false,
+          readOnly: true,
+          placeholder: "",
+          options: [{
+            value: "CHM-2026-X9",
+            text: ""
+          }] // Fallback de valor inicial
+        },
+        {
+          tipo: "text",
+          label: "Nome do Solicitante",
+          name: "nome_usuario",
+          required: true,
+          readOnly: false,
+          placeholder: "Digite seu nome completo..."
+        },
+        {
+          tipo: "number",
+          label: "Idade (Mín: 18 | Máx: 70 | Passo: 2)",
+          name: "idade_usuario",
+          required: true,
+          readOnly: false,
+          placeholder: "Ex: 20",
+          min: 18,
+          max: 70,
+          step: 2
+        },
+        {
+          tipo: "select",
+          label: "Selecione o Grau de Impacto",
+          name: "prioridade",
+          required: true,
+          readOnly: false,
+          options: [{
+              value: "",
+              text: "-- Selecione uma Opção --"
+            },
+            {
+              value: "baixa",
+              text: "Baixo - Não impede o trabalho"
+            },
+            {
+              value: "media",
+              text: "Médio - Lentidão no sistema"
+            },
+            {
+              value: "alta",
+              text: "Alto - Sistema inoperante"
+            }
+          ]
+        },
+        {
+          tipo: "radio",
+          label: "Deseja receber notificações por SMS?",
+          name: "notifica_sms",
+          required: true,
+          readOnly: false,
+          options: [{
+              value: "sim",
+              text: "Sim, desejo receber"
+            },
+            {
+              value: "nao",
+              text: "Não, obrigado"
+            }
+          ]
+        },
+        {
+          tipo: "checkbox",
+          label: "Ativos Afetados (Múltipla escolha)",
+          name: "ativos_afetados",
+          required: false,
+          readOnly: false,
+          options: [{
+              value: "desktop",
+              text: "Computador Desktop"
+            },
+            {
+              value: "mobile",
+              text: "Aplicativo Mobile"
+            },
+            {
+              value: "banco_dados",
+              text: "Acesso ao Banco de Dados"
+            }
+          ]
+        }
+      ];
+      // Executa a chamada do componente de exibição do formulário dinâmico
+      showModalForm.show("Abertura de Ocorrência Técnica", "warning", definicaoDeCampos, function(dadosInformados) {
+        var logElement = document.getElementById("log-resultado");
+        if (dadosInformados) {
+          // Exibe os dados estruturados no formato JSON na tela
+          logElement.style.display = "block";
+          logElement.textContent = "✓ Formulário Enviado com Sucesso!\n\nDados Capturados:\n" + JSON.stringify(dadosInformados, null, 4);
+        } else {
+          logElement.style.display = "block";
+          logElement.textContent = "✕ Operação cancelada ou fechada pelo usuário.";
+        }
+      });
+      // Código adicional opcional para preenchimento de valor default em campo readOnly pré-existente no loop
+      setTimeout(function() {
+        var campoReadOnly = document.getElementsByName("id_chamado")[0];
+        if (campoReadOnly) campoReadOnly.value = "CHM-2026-X9";
+      }, 50);
+    });
+  </script>
+</body>
+
+</html>
