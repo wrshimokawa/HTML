@@ -81,6 +81,11 @@ var showModalForm = {
       ".choice-container { display: flex !important; flex-direction: column !important; gap: 8px !important; padding-top: 4px !important; }" +
       ".choice-item { display: flex !important; align-items: center !important; gap: 8px !important; font-size: 14px !important; color: #334155 !important; cursor: pointer !important; }" +
       ".choice-item input { cursor: pointer !important; width: 16px !important; height: 16px !important; margin: 0 !important; }" +
+      ".custom-message { padding: 16px !important; border: 1px solid transparent !important; border-radius: 10px !important; margin-bottom: 16px !important; font-family: sans-serif !important; font-size: 14px !important; line-height: 1.55 !important; }" +
+      ".custom-message.info { background: #e6f2ff !important; border-color: #7fb8ff !important; color: #0f4a82 !important; }" +
+      ".custom-message.alert { background: #fff7e6 !important; border-color: #ffdc8a !important; color: #7a5a00 !important; }" +
+      ".custom-message.error { background: #fde8e8 !important; border-color: #f5a6a6 !important; color: #9b1e1e !important; }" +
+      ".custom-message-title { font-weight: 700 !important; margin-bottom: 8px !important; }" +
       ".custom-form-buttons { display: flex !important; justify-content: flex-start !important; gap: 16px !important; }" +
       ".custom-form-btn { padding: 12px 24px !important; border-radius: 6px !important; border: none !important; cursor: pointer !important; font-weight: 600 !important; font-size: 14px !important; font-family: sans-serif !important; transition: background 0.15s ease !important; }" +
       ".btn-ok { background: " +
@@ -118,10 +123,13 @@ var showModalForm = {
       var divGroup = document.createElement("div");
       divGroup.className = "form-group";
 
-      var label = document.createElement("label");
-      label.className = "main-label";
-      label.textContent = f.label + (f.required ? " *" : "");
-      divGroup.appendChild(label);
+      var isMessageTipo = f.tipo === "info" || f.tipo === "alert" || f.tipo === "error";
+      if (!isMessageTipo) {
+        var label = document.createElement("label");
+        label.className = "main-label";
+        label.textContent = f.label + (f.required ? " *" : "");
+        divGroup.appendChild(label);
+      }
 
       // Tratamento por Tipo de Campo
       if (f.tipo === "select") {
@@ -170,6 +178,21 @@ var showModalForm = {
           }
         }
         divGroup.appendChild(choiceWrapper);
+      } else if (f.tipo === "info" || f.tipo === "alert" || f.tipo === "error") {
+        var messageContainer = document.createElement("div");
+        messageContainer.className = "custom-message " + f.tipo;
+
+        if (f.label) {
+          var messageTitle = document.createElement("div");
+          messageTitle.className = "custom-message-title";
+          messageTitle.textContent = f.label;
+          messageContainer.appendChild(messageTitle);
+        }
+
+        var messageBody = document.createElement("div");
+        messageBody.innerHTML = f.mensagem || f.message || "";
+        messageContainer.appendChild(messageBody);
+        divGroup.appendChild(messageContainer);
       } else {
         // Tipos Input Padrão: text, number, email, date, etc.
         var input = document.createElement("input");
@@ -217,8 +240,9 @@ var showModalForm = {
     var obterValoresFormulario = function () {
       var dados = {};
       for (var m = 0; m < fields.length; m++) {
-        var fieldDef = fields[m];
-        var nome = fieldDef.name;
+        var fieldDef = fields[m];        if (fieldDef.tipo === "info" || fieldDef.tipo === "alert" || fieldDef.tipo === "error") {
+          continue;
+        }        var nome = fieldDef.name;
         if (fieldDef.tipo === "checkbox") {
           var checkboxes = formElement.querySelectorAll(
             'input[name="' + nome + '"]:checked'
